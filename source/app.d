@@ -134,9 +134,10 @@ void update(T)(ref T currentGeneration) {
 	currentGeneration = nextGeneration;
 }
 
-// refactor
 int countNeighbours(T)(T cells, int i, int j) {
 	int neighbours = 0;
+
+	/+
 	bool cmin = j - 1 > 0;
 	bool cmax = j + 1 < gridWidth;
 	bool rmin = i - 1 > 0;
@@ -199,6 +200,45 @@ int countNeighbours(T)(T cells, int i, int j) {
 			neighbours++;
 		}
 	}
+	+/
+
+	/*
+		This is an improvement to the countNeighbours function 
+			proposed by Steven Schveighoffer.
+
+		It is the same process as done previously with multiple ifs statements.
+	*/
+	bool hasNeighbour(int ni, int nj) {
+		// off the board 
+		if(ni < 0 || nj < 0 || ni >= gridHeight || nj >= gridWidth)  {
+			return false; 
+		}
+
+		return cells[ni][nj].alive;
+	}
+
+	// count live cells
+	foreach(di; -1 .. 2) {
+		foreach(dj; -1 .. 2) {
+			if(hasNeighbour(i + di, j + dj)) {
+				++neighbours;
+			}
+		}
+	}
+	
+	// subtract the current cell if it's alive, since it is included in the loop above.
+	if(cells[i][j].alive) {
+		--neighbours;
+	}
 
 	return neighbours;
 }
+
+
+
+
+
+
+
+
+
